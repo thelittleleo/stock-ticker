@@ -179,7 +179,14 @@
 </div>
 
 <script>
-const WS_URL       = 'ws://localhost:8765';
+const RAILWAY_DOMAIN = 'YOUR_PROJECT.up.railway.app';  // ← fill in after deploy
+const WS_URL = (() => {
+  const local = window.location.hostname === 'localhost' ||
+                window.location.hostname === '127.0.0.1';
+  return local
+    ? 'ws://localhost:8765'
+    : `wss://${RAILWAY_DOMAIN}`;
+})();
 const RECONNECT_MS = 3000;
 const SPARKLINE_H  = 48;
 

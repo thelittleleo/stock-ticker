@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
-HOST = "localhost"
-PORT = 8765
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", 8765))
 SYMBOLS = ["AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "GOOGL", "META"]
 HISTORY_LEN = 60
 
