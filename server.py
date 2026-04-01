@@ -13,12 +13,31 @@ load_dotenv()
 FINNHUB_API_KEY = os.getenv("FINNHUB_API_KEY")
 HOST = "0.0.0.0"
 PORT = int(os.environ.get("PORT", 8765))
-SYMBOLS = ["AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "GOOGL", "META"]
+
+STOCK_SYMBOLS  = ["AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "GOOGL", "META"]
+CRYPTO_SYMBOLS = ["BINANCE:BTCUSDT", "BINANCE:ETHUSDT", "BINANCE:SOLUSDT",
+                  "BINANCE:XRPUSDT", "BINANCE:BNBUSDT"]
 HISTORY_LEN = 60
 
-# {symbol: deque of price points}
-price_history: dict[str, deque] = {sym: deque(maxlen=HISTORY_LEN) for sym in SYMBOLS}
-# {symbol: last price} for computing change
+
+def crypto_display(sym: str) -> str:
+    """BINANCE:BTCUSDT -> BTC/USDT"""
+    base = sym.split(":", 1)[-1]
+    for quote in ("USDT", "USDC", "BTC", "ETH", "BNB"):
+        if base.endswith(quote):
+            return base[:-len(quote)] + "/" + quote
+    return base
+
+
+# Map raw Finnhub symbol -> display ticker used everywhere else
+SYMBOL_TO_TICKER: dict[str, str] = {s: s for s in STOCK_SYMBOLS}
+SYMBOL_TO_TICKER.update({s: crypto_display(s) for s in CRYPTO_SYMBOLS})
+
+ALL_TICKERS = list(SYMBOL_TO_TICKER.values())
+
+# {ticker: deque of price points}
+price_history: dict[str, deque] = {t: deque(maxlen=HISTORY_LEN) for t in ALL_TICKERS}
+# {ticker: last price} for computing deltas
 last_price: dict[str, float] = {}
 
 # connected browser clients
@@ -27,47 +46,51 @@ clients: set = set()
 
 def normalize_trade(trade: dict) -> dict | None:
     """Convert a Finnhub trade entry into a tick dict."""
-    sym = trade.get("s")
-    price = trade.get("p")
-    if not sym or price is None:
+    raw_sym = trade.get("s")
+    price   = trade.get("p")
+    if not raw_sym or price is None:
         return None
 
-    prev = last_price.get(sym, price)
-    change = price - prev
+    ticker     = SYMBOL_TO_TICKER.get(raw_sym, raw_sym)
+    asset_type = "crypto" if ":" in raw_sym else "stock"
+
+    prev       = last_price.get(ticker, price)
+    change     = price - prev
     change_pct = (change / prev * 100) if prev else 0.0
 
-    last_price[sym] = price
+    last_price[ticker] = price
 
     return {
-        "ticker": sym,
-        "price": price,
+        "ticker":     ticker,
+        "type":       asset_type,
+        "price":      price,
         "prev_price": prev,
-        "change": round(change, 4),
+        "change":     round(change, 4),
         "change_pct": round(change_pct, 4),
-        "timestamp": trade.get("t", int(datetime.now(timezone.utc).timestamp() * 1000)),
-        "volume": trade.get("v", 0),
+        "timestamp":  trade.get("t", int(datetime.now(timezone.utc).timestamp() * 1000)),
+        "volume":     trade.get("v", 0),
     }
 
 
 async def fetch_quotes() -> None:
-    """Fetch current quotes from Finnhub REST API and seed price_history."""
-    url = "https://finnhub.io/api/v1/quote"
+    """Seed stock price_history from Finnhub REST API (crypto has no simple quote endpoint)."""
+    url    = "https://finnhub.io/api/v1/quote"
     now_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
     async with httpx.AsyncClient(timeout=10) as client:
         tasks = [
             client.get(url, params={"symbol": sym, "token": FINNHUB_API_KEY})
-            for sym in SYMBOLS
+            for sym in STOCK_SYMBOLS
         ]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
 
-    for sym, resp in zip(SYMBOLS, responses):
+    for sym, resp in zip(STOCK_SYMBOLS, responses):
         if isinstance(resp, Exception):
             print(f"[rest] failed to fetch {sym}: {resp}")
             continue
         if resp.status_code != 200:
             print(f"[rest] {sym} HTTP {resp.status_code}")
             continue
-        q = resp.json()
+        q     = resp.json()
         price = q.get("c")
         prev  = q.get("pc")
         if not price:
@@ -77,6 +100,7 @@ async def fetch_quotes() -> None:
         change_pct = (change / prev * 100) if prev else 0.0
         tick = {
             "ticker":     sym,
+            "type":       "stock",
             "price":      price,
             "prev_price": prev,
             "change":     round(change, 4),
@@ -97,14 +121,15 @@ async def broadcast(payload: dict) -> None:
 
 
 async def finnhub_listener() -> None:
-    """Connect to Finnhub, subscribe to symbols, and forward ticks."""
+    """Connect to Finnhub, subscribe to stocks + crypto, and forward ticks."""
+    all_subs = STOCK_SYMBOLS + CRYPTO_SYMBOLS
     url = f"wss://ws.finnhub.io?token={FINNHUB_API_KEY}"
     async for ws in websockets.connect(url):
         try:
-            # Subscribe to each symbol
-            for sym in SYMBOLS:
+            for sym in all_subs:
                 await ws.send(json.dumps({"type": "subscribe", "symbol": sym}))
-            print(f"[finnhub] subscribed to {', '.join(SYMBOLS)}")
+            print(f"[finnhub] subscribed to {len(all_subs)} symbols "
+                  f"({len(STOCK_SYMBOLS)} stocks, {len(CRYPTO_SYMBOLS)} crypto)")
 
             async for raw in ws:
                 msg = json.loads(raw)
@@ -130,11 +155,9 @@ async def client_handler(ws) -> None:
     print(f"[server] client connected: {remote}  (total: {len(clients)})")
 
     try:
-        # Send snapshot for all symbols — include empty deques so cards always render
-        snapshot = {sym: list(price_history[sym]) for sym in SYMBOLS}
+        snapshot = {ticker: list(price_history[ticker]) for ticker in ALL_TICKERS}
         await ws.send(json.dumps({"type": "snapshot", "data": snapshot}))
 
-        # Keep alive — client messages are ignored but we need to hold the loop open
         async for _ in ws:
             pass
 

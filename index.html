@@ -8,19 +8,19 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:        #0d0d0f;
-    --surface:   #16181c;
-    --border:    #2a2d35;
-    --muted:     #555b6e;
-    --text:      #e2e8f0;
-    --subtext:   #94a3b8;
-    --green:     #22c55e;
-    --red:       #ef4444;
-    --green-dim: #14532d;
-    --red-dim:   #7f1d1d;
-    --accent:    #3b82f6;
-    --flash-up:  rgba(34,197,94,0.18);
-    --flash-dn:  rgba(239,68,68,0.18);
+    --bg:       #0d0d0f;
+    --surface:  #16181c;
+    --surface2: #1e2028;
+    --border:   #2a2d35;
+    --muted:    #555b6e;
+    --text:     #e2e8f0;
+    --subtext:  #94a3b8;
+    --green:    #22c55e;
+    --red:      #ef4444;
+    --accent:   #3b82f6;
+    --gold:     #f59e0b;
+    --flash-up: rgba(34,197,94,0.18);
+    --flash-dn: rgba(239,68,68,0.18);
   }
 
   body {
@@ -35,21 +35,15 @@
 
   /* ── ticker bar ── */
   #ticker-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: sticky; top: 0; z-index: 100;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    height: 36px;
-    display: flex;
-    align-items: center;
+    overflow: hidden; height: 36px;
+    display: flex; align-items: center;
   }
   #ticker-track {
-    display: flex;
-    gap: 48px;
-    white-space: nowrap;
-    animation: scroll-left 30s linear infinite;
+    display: flex; gap: 48px; white-space: nowrap;
+    animation: scroll-left 40s linear infinite;
     padding: 0 24px;
   }
   #ticker-bar:hover #ticker-track { animation-play-state: paused; }
@@ -64,95 +58,182 @@
 
   /* ── header ── */
   #header {
-    display: flex;
-    align-items: center;
+    display: flex; align-items: center;
     justify-content: space-between;
     padding: 14px 24px 0;
   }
   #header h1 { font-size: 18px; letter-spacing: 2px; color: var(--accent); }
-  #status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--subtext);
-  }
+  #status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--subtext); }
   #status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--muted);
-    transition: background .3s;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--muted); transition: background .3s;
   }
   #status-dot.connected    { background: var(--green); }
-  #status-dot.reconnecting { background: var(--red); animation: pulse 1s infinite; }
-  @keyframes pulse {
-    0%,100% { opacity: 1; } 50% { opacity: .3; }
+  #status-dot.reconnecting { background: var(--red); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+  /* ── section labels ── */
+  .section-label {
+    font-size: 11px; letter-spacing: 2px; color: var(--muted);
+    padding: 14px 24px 4px;
   }
 
   /* ── card grid ── */
   #grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 12px;
-    padding: 16px 24px;
+    gap: 12px; padding: 8px 24px 16px;
   }
 
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-    cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; cursor: pointer;
     transition: border-color .2s, transform .1s;
-    position: relative;
-    overflow: hidden;
+    position: relative; overflow: hidden;
   }
-  .card:hover   { border-color: var(--accent); transform: translateY(-2px); }
+  .card:hover    { border-color: var(--accent); transform: translateY(-2px); }
   .card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-
   .card.flash-up { animation: flash-up .45s ease-out; }
   .card.flash-dn { animation: flash-dn .45s ease-out; }
-  @keyframes flash-up {
-    0%   { background: var(--flash-up); }
-    100% { background: var(--surface); }
-  }
-  @keyframes flash-dn {
-    0%   { background: var(--flash-dn); }
-    100% { background: var(--surface); }
-  }
+  @keyframes flash-up { 0% { background: var(--flash-up); } 100% { background: var(--surface); } }
+  @keyframes flash-dn { 0% { background: var(--flash-dn); } 100% { background: var(--surface); } }
 
-  .card-header  { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .card-header  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
   .card-sym     { font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+  .card-sym-row { display: flex; align-items: center; gap: 6px; }
+  .badge-crypto { font-size: 9px; padding: 1px 5px; border-radius: 3px;
+                  background: rgba(245,158,11,.15); color: var(--gold);
+                  border: 1px solid rgba(245,158,11,.3); letter-spacing: 1px; }
+  .badge-port   { font-size: 9px; padding: 1px 5px; border-radius: 3px;
+                  background: rgba(59,130,246,.15); color: var(--accent);
+                  border: 1px solid rgba(59,130,246,.3); letter-spacing: 1px; }
+  .card-meta    { display: flex; align-items: center; gap: 6px; }
   .card-vol     { font-size: 10px; color: var(--muted); }
-  .card-price   { font-size: 22px; font-weight: bold; letter-spacing: .5px; margin-bottom: 4px; }
-  .card-change  { font-size: 12px; margin-bottom: 10px; }
-  .card-change .abs  { margin-right: 8px; }
-  .up { color: var(--green); }
-  .dn { color: var(--red); }
+  .bell-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 13px; opacity: .35; transition: opacity .15s;
+    padding: 0; line-height: 1;
+  }
+  .bell-btn:hover  { opacity: .8; }
+  .bell-btn.active { opacity: 1; filter: sepia(1) saturate(3) hue-rotate(5deg); }
+  .card-price  { font-size: 22px; font-weight: bold; letter-spacing: .5px; margin-bottom: 4px; }
+  .card-change { font-size: 12px; margin-bottom: 10px; }
+  .card-change .abs { margin-right: 8px; }
+  .up   { color: var(--green); }
+  .dn   { color: var(--red); }
   .flat { color: var(--muted); }
-
-  .card canvas  { display: block; width: 100%; }
+  .card canvas { display: block; width: 100%; }
 
   /* ── detail chart ── */
   #detail {
-    margin: 0 24px 24px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 18px;
-    display: none;
+    margin: 0 24px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px; display: none;
   }
   #detail.visible { display: block; }
-  #detail-header {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 16px;
+  #detail-header  { display: flex; align-items: baseline; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  #detail-sym     { font-size: 22px; font-weight: bold; letter-spacing: 2px; }
+  #detail-price   { font-size: 30px; font-weight: bold; }
+  #detail-change  { font-size: 14px; }
+  #detail-canvas  { display: block; width: 100%; border-radius: 4px; }
+
+  /* ── portfolio form (inside detail) ── */
+  #portfolio-form {
+    margin-top: 16px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 8px;
   }
-  #detail-sym   { font-size: 22px; font-weight: bold; letter-spacing: 2px; }
-  #detail-price { font-size: 30px; font-weight: bold; }
-  #detail-change { font-size: 14px; }
-  #detail-canvas { display: block; width: 100%; border-radius: 4px; }
+  #portfolio-form h3 { font-size: 12px; letter-spacing: 2px; color: var(--muted); }
+  .pform-row { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+  .pform-row label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: var(--subtext); }
+  .pform-row input {
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: inherit; font-size: 13px;
+    padding: 5px 8px; border-radius: 4px; width: 120px;
+    outline: none;
+  }
+  .pform-row input:focus { border-color: var(--accent); }
+  .pform-row input[type=number] { -moz-appearance: textfield; }
+  .pform-row input::-webkit-outer-spin-button,
+  .pform-row input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .btn {
+    padding: 5px 14px; border-radius: 4px; border: 1px solid var(--border);
+    font-family: inherit; font-size: 12px; cursor: pointer;
+    background: var(--surface2); color: var(--text);
+    transition: border-color .15s, background .15s;
+  }
+  .btn:hover        { border-color: var(--accent); background: var(--surface); }
+  .btn.btn-primary  { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.btn-primary:hover { background: #2563eb; }
+  .btn.btn-danger   { border-color: var(--red); color: var(--red); }
+  .btn.btn-danger:hover { background: rgba(239,68,68,.1); }
+
+  /* ── portfolio section ── */
+  #portfolio {
+    margin: 0 24px 24px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    overflow: hidden;
+  }
+  #portfolio-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+  }
+  #portfolio-header h2 { font-size: 13px; letter-spacing: 2px; color: var(--subtext); }
+  #portfolio-totals    { display: flex; gap: 24px; font-size: 13px; }
+  .ptotal-label  { color: var(--muted); margin-right: 6px; }
+  #portfolio-empty {
+    padding: 24px 18px; color: var(--muted); font-size: 13px; text-align: center;
+  }
+  #portfolio-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; padding: 8px 14px;
+    font-size: 11px; letter-spacing: 1px; color: var(--muted);
+    border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px; font-size: 13px;
+    border-bottom: 1px solid rgba(42,45,53,.6); white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .td-sym { font-weight: bold; letter-spacing: .5px; }
+  .td-remove {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); font-size: 14px; padding: 0;
+    transition: color .15s;
+  }
+  .td-remove:hover { color: var(--red); }
+  #portfolio-footer {
+    display: flex; justify-content: flex-end; gap: 32px;
+    padding: 12px 18px; border-top: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .footer-label { color: var(--muted); margin-right: 8px; }
+  #footer-total-val { font-weight: bold; }
+
+  /* ── alert modal ── */
+  #alert-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.65);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500;
+  }
+  #alert-modal.hidden { display: none; }
+  .modal-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px; width: 300px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .modal-title { font-size: 15px; font-weight: bold; letter-spacing: 1px; }
+  .modal-current { font-size: 12px; color: var(--subtext); }
+  #alert-target {
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-family: inherit; font-size: 15px;
+    padding: 8px 12px; border-radius: 4px; width: 100%;
+    outline: none;
+  }
+  #alert-target:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 </style>
 </head>
 <body>
@@ -167,7 +248,11 @@
   </div>
 </div>
 
-<div id="grid"></div>
+<div class="section-label">STOCKS</div>
+<div id="grid-stocks" class="grid"></div>
+
+<div class="section-label">CRYPTO</div>
+<div id="grid-crypto" class="grid"></div>
 
 <div id="detail">
   <div id="detail-header">
@@ -176,51 +261,117 @@
     <span id="detail-change"></span>
   </div>
   <canvas id="detail-canvas" height="200"></canvas>
+  <div id="portfolio-form">
+    <h3>PORTFOLIO ENTRY</h3>
+    <div class="pform-row">
+      <label>Quantity
+        <input type="number" id="pform-qty" placeholder="0" step="any" min="0">
+      </label>
+      <label>Buy Price
+        <input type="number" id="pform-buy" placeholder="0.00" step="any" min="0">
+      </label>
+      <button class="btn btn-primary" id="pform-save">Save</button>
+      <button class="btn btn-danger"  id="pform-remove">Remove</button>
+    </div>
+  </div>
 </div>
+
+<div id="portfolio">
+  <div id="portfolio-header">
+    <h2>PORTFOLIO</h2>
+    <div id="portfolio-totals">
+      <span><span class="ptotal-label">Value</span><span id="footer-total-val">—</span></span>
+      <span><span class="ptotal-label">P&amp;L</span><span id="footer-total-pnl">—</span></span>
+    </div>
+  </div>
+  <p id="portfolio-empty">Click any symbol card to add it to your portfolio.</p>
+  <div id="portfolio-table-wrap" style="display:none">
+    <table>
+      <thead>
+        <tr>
+          <th>SYMBOL</th><th>QTY</th><th>BUY PRICE</th>
+          <th>CURRENT</th><th>VALUE</th><th>P&amp;L</th><th>P&amp;L %</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="portfolio-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Alert modal -->
+<div id="alert-modal" class="hidden">
+  <div class="modal-box">
+    <div class="modal-title">Price Alert — <span id="alert-modal-sym"></span></div>
+    <div class="modal-current">Current: <span id="alert-modal-price"></span></div>
+    <input type="number" id="alert-target" placeholder="Target price" step="any">
+    <div class="modal-actions">
+      <button class="btn btn-danger"  id="alert-clear">Clear</button>
+      <button class="btn"             id="alert-cancel">Cancel</button>
+      <button class="btn btn-primary" id="alert-save">Set Alert</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px; padding: 8px 24px 16px;
+  }
+</style>
 
 <script>
 const RAILWAY_DOMAIN = 'web-production-479f7.up.railway.app';  // ← fill in after deploy
 const WS_URL = (() => {
-  const local = window.location.hostname === 'localhost' ||
-                window.location.hostname === '127.0.0.1';
-  return local
-    ? 'ws://localhost:8765'
-    : `wss://${RAILWAY_DOMAIN}`;
+  const { protocol, hostname } = window.location;
+  const local = protocol === 'file:' ||
+                hostname  === 'localhost' ||
+                hostname  === '127.0.0.1';
+  return local ? 'ws://localhost:8765' : `wss://${RAILWAY_DOMAIN}`;
 })();
 const RECONNECT_MS = 3000;
 const SPARKLINE_H  = 48;
 
-// state
-const history  = {};   // sym -> [{price, change, change_pct, timestamp, volume}]
-const cards    = {};   // sym -> DOM element
-const tickerEl = {};   // sym -> ticker-item element
-let   selected = null;
-let   ws       = null;
+// ── State ─────────────────────────────────────────────────────────────────────
+const history   = {};   // sym -> [{ticker,type,price,...}]
+const cards     = {};   // sym -> card DOM element
+const tickerEl  = {};   // sym -> ticker-item DOM element (first copy)
+const symType   = {};   // sym -> "stock"|"crypto"
+let   selected  = null;
+let   ws        = null;
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+const isCrypto = sym => sym.includes('/');
+
+function loadPortfolio() {
+  try { return JSON.parse(localStorage.getItem('portfolio') || '{}'); }
+  catch { return {}; }
+}
+function savePortfolio(p) { localStorage.setItem('portfolio', JSON.stringify(p)); }
+
+function loadAlerts() {
+  try { return JSON.parse(localStorage.getItem('alerts') || '{}'); }
+  catch { return {}; }
+}
+function saveAlerts(a) { localStorage.setItem('alerts', JSON.stringify(a)); }
 
 // ── WebSocket ─────────────────────────────────────────────────────────────────
 function connect() {
   setStatus('reconnecting', 'Connecting…');
   ws = new WebSocket(WS_URL);
-
-  ws.onopen = () => setStatus('connected', 'Connected');
-
+  ws.onopen    = () => setStatus('connected', 'Connected');
   ws.onmessage = ({ data }) => {
     const msg = JSON.parse(data);
     if (msg.type === 'snapshot') handleSnapshot(msg.data);
     else if (msg.type === 'tick') handleTick(msg.data);
   };
-
-  ws.onclose = () => {
-    setStatus('reconnecting', 'Reconnecting…');
-    setTimeout(connect, RECONNECT_MS);
-  };
-
+  ws.onclose = () => { setStatus('reconnecting', 'Reconnecting…'); setTimeout(connect, RECONNECT_MS); };
   ws.onerror = () => ws.close();
 }
 
 function setStatus(cls, label) {
-  const dot = document.getElementById('status-dot');
-  dot.className = cls;
+  document.getElementById('status-dot').className = cls;
   document.getElementById('status-label').textContent = label;
 }
 
@@ -228,16 +379,19 @@ function setStatus(cls, label) {
 function handleSnapshot(data) {
   for (const [sym, ticks] of Object.entries(data)) {
     history[sym] = ticks;
-    if (!cards[sym]) buildCard(sym);
     const latest = ticks[ticks.length - 1];
+    if (latest) symType[sym] = latest.type;
+    if (!cards[sym]) buildCard(sym);
     if (latest) refreshCard(sym, latest, false);
   }
   rebuildTickerBar();
+  renderPortfolio();
 }
 
 // ── Tick ──────────────────────────────────────────────────────────────────────
 function handleTick(tick) {
   const { ticker: sym } = tick;
+  symType[sym] = tick.type;
   if (!history[sym]) history[sym] = [];
   history[sym].push(tick);
   if (history[sym].length > 60) history[sym].shift();
@@ -246,69 +400,92 @@ function handleTick(tick) {
   refreshCard(sym, tick, true);
   updateTickerItem(sym, tick);
   if (selected === sym) drawDetail(sym);
+  renderPortfolioRow(sym);
+  checkAlerts(sym, tick.price);
 }
 
 // ── Card ──────────────────────────────────────────────────────────────────────
 function buildCard(sym) {
+  const crypto = isCrypto(sym);
   const card = document.createElement('div');
   card.className = 'card';
   card.dataset.sym = sym;
   card.innerHTML = `
     <div class="card-header">
-      <span class="card-sym">${sym}</span>
-      <span class="card-vol"></span>
+      <div class="card-sym-row">
+        <span class="card-sym">${sym}</span>
+        ${crypto ? '<span class="badge-crypto">CRYPTO</span>' : ''}
+        <span class="badge-port" style="display:none">IN PORTFOLIO</span>
+      </div>
+      <div class="card-meta">
+        <span class="card-vol"></span>
+        <button class="bell-btn" title="Set price alert">🔔</button>
+      </div>
     </div>
     <div class="card-price">—</div>
     <div class="card-change"><span class="abs">—</span><span class="pct"></span></div>
     <canvas height="${SPARKLINE_H}"></canvas>
   `;
+  card.querySelector('.bell-btn').addEventListener('click', e => {
+    e.stopPropagation();
+    showAlertModal(sym);
+  });
   card.addEventListener('click', () => selectSymbol(sym));
-  document.getElementById('grid').appendChild(card);
+
+  const grid = crypto ? document.getElementById('grid-crypto') : document.getElementById('grid-stocks');
+  grid.appendChild(card);
   cards[sym] = card;
+  syncCardBadges(sym);
+  syncBellState(sym);
 }
 
 function refreshCard(sym, tick, flash) {
   const card = cards[sym];
   if (!card) return;
 
-  const dir = tick.change > 0 ? 'up' : tick.change < 0 ? 'dn' : 'flat';
+  const dir   = tick.change > 0 ? 'up' : tick.change < 0 ? 'dn' : 'flat';
   const arrow = tick.change > 0 ? '▲' : tick.change < 0 ? '▼' : '●';
 
   card.querySelector('.card-price').textContent = fmt(tick.price);
   const absEl = card.querySelector('.card-change .abs');
   const pctEl = card.querySelector('.card-change .pct');
   absEl.textContent = `${arrow} ${fmtChange(tick.change)}`;
-  absEl.className = `abs ${dir}`;
+  absEl.className   = `abs ${dir}`;
   pctEl.textContent = `(${fmtPct(tick.change_pct)}%)`;
-  pctEl.className = dir;
+  pctEl.className   = dir;
   card.querySelector('.card-vol').textContent = fmtVol(tick.volume);
-
   drawSparkline(card.querySelector('canvas'), history[sym] || []);
 
   if (flash) {
     card.classList.remove('flash-up', 'flash-dn');
-    void card.offsetWidth; // reflow
+    void card.offsetWidth;
     card.classList.add(tick.change >= 0 ? 'flash-up' : 'flash-dn');
   }
+}
+
+function syncCardBadges(sym) {
+  const card = cards[sym];
+  if (!card) return;
+  const port = loadPortfolio();
+  const badge = card.querySelector('.badge-port');
+  if (badge) badge.style.display = port[sym] ? '' : 'none';
 }
 
 // ── Ticker bar ────────────────────────────────────────────────────────────────
 function rebuildTickerBar() {
   const track = document.getElementById('ticker-track');
   track.innerHTML = '';
-  tickerEl.clear && tickerEl.clear();
-  for (const sym of Object.keys(history)) {
-    const item = buildTickerItem(sym);
+  const syms = Object.keys(history);
+  for (const sym of syms) {
+    const item = buildTickerItem(sym, false);
     track.appendChild(item);
-    tickerEl[sym] = item;
   }
-  // Duplicate for seamless loop
-  for (const sym of Object.keys(history)) {
+  for (const sym of syms) {
     track.appendChild(buildTickerItem(sym, true));
   }
 }
 
-function buildTickerItem(sym, clone = false) {
+function buildTickerItem(sym, clone) {
   const el = document.createElement('div');
   el.className = 'ticker-item';
   el.innerHTML = `<span class="ticker-sym">${sym}</span><span class="ticker-px">—</span><span class="ticker-chg">—</span>`;
@@ -323,7 +500,7 @@ function updateTickerItem(sym, tick) {
   el.querySelector('.ticker-px').textContent = fmt(tick.price);
   const chg = el.querySelector('.ticker-chg');
   chg.textContent = `${fmtPct(tick.change_pct)}%`;
-  chg.className = `ticker-chg ${dir}`;
+  chg.className   = `ticker-chg ${dir}`;
 }
 
 // ── Detail chart ──────────────────────────────────────────────────────────────
@@ -332,112 +509,304 @@ function selectSymbol(sym) {
   selected = sym;
   cards[sym].classList.add('selected');
 
-  const detail = document.getElementById('detail');
-  detail.classList.add('visible');
+  document.getElementById('detail').classList.add('visible');
   document.getElementById('detail-sym').textContent = sym;
   drawDetail(sym);
+
+  // Populate portfolio form
+  const port = loadPortfolio();
+  const entry = port[sym];
+  document.getElementById('pform-qty').value = entry ? entry.qty      : '';
+  document.getElementById('pform-buy').value = entry ? entry.buyPrice : '';
 }
 
 function drawDetail(sym) {
-  const ticks = history[sym] || [];
+  const ticks  = history[sym] || [];
   const latest = ticks[ticks.length - 1];
   if (!latest) return;
 
-  const dir = latest.change >= 0 ? 'up' : 'dn';
+  const dir   = latest.change >= 0 ? 'up' : 'dn';
   const arrow = latest.change >= 0 ? '▲' : '▼';
-  document.getElementById('detail-price').textContent = fmt(latest.price);
-  document.getElementById('detail-price').className = dir;
+  const priceEl = document.getElementById('detail-price');
+  priceEl.textContent = fmt(latest.price);
+  priceEl.className   = dir;
   const chgEl = document.getElementById('detail-change');
   chgEl.textContent = `${arrow} ${fmtChange(latest.change)}  (${fmtPct(latest.change_pct)}%)`;
-  chgEl.className = dir;
+  chgEl.className   = dir;
 
-  const canvas = document.getElementById('detail-canvas');
+  const canvas  = document.getElementById('detail-canvas');
   canvas.width  = canvas.offsetWidth || 800;
   canvas.height = 200;
-  const prices = ticks.map(t => t.price);
-  drawChart(canvas, prices, latest.change >= 0);
+  drawChart(canvas, ticks.map(t => t.price), latest.change >= 0);
+}
+
+// ── Portfolio ─────────────────────────────────────────────────────────────────
+document.getElementById('pform-save').addEventListener('click', () => {
+  if (!selected) return;
+  const qty      = parseFloat(document.getElementById('pform-qty').value);
+  const buyPrice = parseFloat(document.getElementById('pform-buy').value);
+  if (isNaN(qty) || isNaN(buyPrice) || qty <= 0 || buyPrice <= 0) return;
+  const port = loadPortfolio();
+  port[selected] = { qty, buyPrice };
+  savePortfolio(port);
+  syncCardBadges(selected);
+  renderPortfolio();
+});
+
+document.getElementById('pform-remove').addEventListener('click', () => {
+  if (!selected) return;
+  const port = loadPortfolio();
+  delete port[selected];
+  savePortfolio(port);
+  syncCardBadges(selected);
+  document.getElementById('pform-qty').value = '';
+  document.getElementById('pform-buy').value = '';
+  renderPortfolio();
+});
+
+function currentPrice(sym) {
+  const h = history[sym];
+  if (!h || !h.length) return null;
+  return h[h.length - 1].price;
+}
+
+function renderPortfolio() {
+  const port  = loadPortfolio();
+  const syms  = Object.keys(port);
+  const empty = document.getElementById('portfolio-empty');
+  const wrap  = document.getElementById('portfolio-table-wrap');
+  const tbody = document.getElementById('portfolio-body');
+
+  if (!syms.length) {
+    empty.style.display = '';
+    wrap.style.display  = 'none';
+    document.getElementById('footer-total-val').textContent = '—';
+    document.getElementById('footer-total-pnl').textContent = '—';
+    document.getElementById('footer-total-pnl').className   = '';
+    return;
+  }
+  empty.style.display = 'none';
+  wrap.style.display  = '';
+
+  let totalVal = 0, totalCost = 0;
+  tbody.innerHTML = '';
+
+  for (const sym of syms) {
+    const { qty, buyPrice } = port[sym];
+    const cur  = currentPrice(sym);
+    const val  = cur != null ? cur * qty : null;
+    const cost = buyPrice * qty;
+    const pnl  = val != null ? val - cost : null;
+    const pct  = pnl  != null ? (pnl / cost * 100) : null;
+    const dir  = pnl == null ? '' : pnl >= 0 ? 'up' : 'dn';
+
+    if (val  != null) totalVal  += val;
+    totalCost += cost;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-sym">${sym}</td>
+      <td>${qty}</td>
+      <td>${fmt(buyPrice)}</td>
+      <td>${cur != null ? fmt(cur) : '—'}</td>
+      <td>${val != null ? fmt(val) : '—'}</td>
+      <td class="${dir}">${pnl != null ? fmtChange(pnl) : '—'}</td>
+      <td class="${dir}">${pct != null ? fmtPct(pct) + '%' : '—'}</td>
+      <td><button class="td-remove" data-sym="${sym}" title="Remove">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  tbody.querySelectorAll('.td-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sym  = btn.dataset.sym;
+      const port = loadPortfolio();
+      delete port[sym];
+      savePortfolio(port);
+      syncCardBadges(sym);
+      if (selected === sym) {
+        document.getElementById('pform-qty').value = '';
+        document.getElementById('pform-buy').value = '';
+      }
+      renderPortfolio();
+    });
+  });
+
+  const totalPnl = totalVal - totalCost;
+  const totalPct = totalCost ? (totalPnl / totalCost * 100) : 0;
+  const pnlDir   = totalPnl >= 0 ? 'up' : 'dn';
+
+  document.getElementById('footer-total-val').textContent = fmt(totalVal);
+  const pnlEl = document.getElementById('footer-total-pnl');
+  pnlEl.textContent = `${fmtChange(totalPnl)} (${fmtPct(totalPct)}%)`;
+  pnlEl.className   = pnlDir;
+}
+
+function renderPortfolioRow(sym) {
+  // Lightweight update: only re-render if this sym is in portfolio
+  const port = loadPortfolio();
+  if (port[sym]) renderPortfolio();
+}
+
+// ── Alerts ────────────────────────────────────────────────────────────────────
+let alertModalSym = null;
+
+async function requestNotifPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function showAlertModal(sym) {
+  alertModalSym = sym;
+  const cur = currentPrice(sym);
+  document.getElementById('alert-modal-sym').textContent   = sym;
+  document.getElementById('alert-modal-price').textContent = cur != null ? fmt(cur) : '—';
+
+  const alerts  = loadAlerts();
+  const existing = alerts[sym];
+  document.getElementById('alert-target').value = existing ? existing.target : '';
+
+  document.getElementById('alert-modal').classList.remove('hidden');
+  document.getElementById('alert-target').focus();
+}
+
+document.getElementById('alert-cancel').addEventListener('click', () => {
+  document.getElementById('alert-modal').classList.add('hidden');
+});
+
+document.getElementById('alert-save').addEventListener('click', async () => {
+  const target = parseFloat(document.getElementById('alert-target').value);
+  if (isNaN(target) || target <= 0) return;
+  await requestNotifPermission();
+
+  const cur     = currentPrice(alertModalSym) ?? target;
+  const alerts  = loadAlerts();
+  alerts[alertModalSym] = { target, direction: target >= cur ? 'above' : 'below', triggered: false };
+  saveAlerts(alerts);
+  syncBellState(alertModalSym);
+  document.getElementById('alert-modal').classList.add('hidden');
+});
+
+document.getElementById('alert-clear').addEventListener('click', () => {
+  const alerts = loadAlerts();
+  delete alerts[alertModalSym];
+  saveAlerts(alerts);
+  syncBellState(alertModalSym);
+  document.getElementById('alert-modal').classList.add('hidden');
+});
+
+// Close modal on backdrop click
+document.getElementById('alert-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('alert-modal'))
+    document.getElementById('alert-modal').classList.add('hidden');
+});
+
+// Enter key in target input
+document.getElementById('alert-target').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('alert-save').click();
+  if (e.key === 'Escape') document.getElementById('alert-modal').classList.add('hidden');
+});
+
+function syncBellState(sym) {
+  const card = cards[sym];
+  if (!card) return;
+  const alerts = loadAlerts();
+  const btn    = card.querySelector('.bell-btn');
+  btn.classList.toggle('active', !!alerts[sym] && !alerts[sym].triggered);
+}
+
+function checkAlerts(sym, price) {
+  const alerts = loadAlerts();
+  const alert  = alerts[sym];
+  if (!alert || alert.triggered) return;
+
+  const hit = alert.direction === 'above' ? price >= alert.target
+                                           : price <= alert.target;
+  if (!hit) return;
+
+  // Mark triggered
+  alerts[sym].triggered = true;
+  saveAlerts(alerts);
+  syncBellState(sym);
+
+  // Flash card amber
+  const card = cards[sym];
+  if (card) {
+    card.style.transition = 'none';
+    card.style.borderColor = '#f59e0b';
+    setTimeout(() => { card.style.transition = ''; card.style.borderColor = ''; }, 2000);
+  }
+
+  // Browser notification
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(`Alert: ${sym}`, {
+      body: `Price ${fmt(price)} crossed target ${fmt(alert.target)}`,
+    });
+  }
 }
 
 // ── Canvas drawing ────────────────────────────────────────────────────────────
 function drawSparkline(canvas, ticks) {
   canvas.width = canvas.offsetWidth || 180;
-  const prices = ticks.map(t => t.price);
   const latest = ticks[ticks.length - 1];
-  drawChart(canvas, prices, !latest || latest.change >= 0);
+  drawChart(canvas, ticks.map(t => t.price), !latest || latest.change >= 0);
 }
 
 function drawChart(canvas, prices, isUp) {
-  const ctx  = canvas.getContext('2d');
-  const W    = canvas.width;
-  const H    = canvas.height;
-  const pad  = 4;
-
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height, pad = 4;
   ctx.clearRect(0, 0, W, H);
   if (prices.length < 2) return;
 
-  const min  = Math.min(...prices);
-  const max  = Math.max(...prices);
-  const span = max - min || 1;
+  const min   = Math.min(...prices);
+  const max   = Math.max(...prices);
+  const span  = max - min || 1;
   const color = isUp ? '#22c55e' : '#ef4444';
-  const colorDim = isUp ? '#14532d' : '#7f1d1d';
-
   const xStep = (W - pad * 2) / (prices.length - 1);
   const yOf   = p => H - pad - ((p - min) / span) * (H - pad * 2);
 
-  // Fill gradient
   const grad = ctx.createLinearGradient(0, 0, 0, H);
   grad.addColorStop(0, color + '55');
   grad.addColorStop(1, color + '00');
 
   ctx.beginPath();
   ctx.moveTo(pad, yOf(prices[0]));
-  for (let i = 1; i < prices.length; i++) {
-    ctx.lineTo(pad + i * xStep, yOf(prices[i]));
-  }
-  const lastX = pad + (prices.length - 1) * xStep;
-  ctx.lineTo(lastX, H);
+  for (let i = 1; i < prices.length; i++) ctx.lineTo(pad + i * xStep, yOf(prices[i]));
+  ctx.lineTo(pad + (prices.length - 1) * xStep, H);
   ctx.lineTo(pad, H);
   ctx.closePath();
   ctx.fillStyle = grad;
   ctx.fill();
 
-  // Line
   ctx.beginPath();
   ctx.moveTo(pad, yOf(prices[0]));
-  for (let i = 1; i < prices.length; i++) {
-    ctx.lineTo(pad + i * xStep, yOf(prices[i]));
-  }
+  for (let i = 1; i < prices.length; i++) ctx.lineTo(pad + i * xStep, yOf(prices[i]));
   ctx.strokeStyle = color;
-  ctx.lineWidth = H > 80 ? 2 : 1.5;
-  ctx.lineJoin = 'round';
+  ctx.lineWidth   = H > 80 ? 2 : 1.5;
+  ctx.lineJoin    = 'round';
   ctx.stroke();
 
-  // Dot at latest
-  if (prices.length > 0) {
-    const lx = pad + (prices.length - 1) * xStep;
-    const ly = yOf(prices[prices.length - 1]);
-    ctx.beginPath();
-    ctx.arc(lx, ly, H > 80 ? 4 : 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-  }
+  const lx = pad + (prices.length - 1) * xStep;
+  const ly = yOf(prices[prices.length - 1]);
+  ctx.beginPath();
+  ctx.arc(lx, ly, H > 80 ? 4 : 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
 }
 
 // ── Formatting ────────────────────────────────────────────────────────────────
-const fmt      = n => n == null ? '—' : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmt       = n => n == null ? '—' : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const fmtChange = n => n == null ? '—' : (n >= 0 ? '+' : '') + fmt(n);
-const fmtPct   = n => n == null ? '—' : (n >= 0 ? '+' : '') + n.toFixed(2);
-const fmtVol   = n => !n ? '' : n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n);
+const fmtPct    = n => n == null ? '—' : (n >= 0 ? '+' : '') + n.toFixed(2);
+const fmtVol    = n => !n ? '' : n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 connect();
 
-// Redraw sparklines + detail chart on resize
 window.addEventListener('resize', () => {
   for (const sym of Object.keys(cards)) {
-    const card = cards[sym];
-    const ticks = history[sym] || [];
-    drawSparkline(card.querySelector('canvas'), ticks);
+    drawSparkline(cards[sym].querySelector('canvas'), history[sym] || []);
   }
   if (selected) drawDetail(selected);
 });
